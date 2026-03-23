@@ -1,0 +1,52 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Claude-inspired palette — warm sand tones with terracotta accent */
+  --bg: #1a1915;
+  --surface: #24221d;
+  --surface2: #2e2c26;
+  --border: #3d3a32;
+  --accent: #da7756;
+  --accent-hover: #c4664a;
+  --accent-soft: rgba(218, 119, 86, 0.12);
+  --text: #ece5d8;
+  --text-muted: #9b9385;
+  --highlight-regex: rgba(218, 165, 86, 0.40);
+  --highlight-ner: rgba(218, 119, 86, 0.35);
+  --redaction: #000000;
+  --danger: #e55050;
+  --success: #7daa68;
+  --warning: #d4a04a;
+  --font: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

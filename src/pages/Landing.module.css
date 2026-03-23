@@ -1,0 +1,650 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.headerCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.headerCta:hover { background: var(--accent-hover); }
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.03em;
+}
+
+.logoMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: var(--accent);
+  border-radius: 8px;
+  color: #fff;
+}
+
+/* ── Hero ── */
+.heroSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 24px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle radial glow behind hero */
+.heroSection::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 500px;
+  background: radial-gradient(ellipse, rgba(218, 119, 86, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+  background: var(--surface);
+}
+
+.heroBadgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 6px var(--success);
+}
+
+.heroTitle {
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.heroAccent {
+  background: linear-gradient(135deg, var(--accent), #e8a87c, #d4a04a, var(--accent));
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.heroSub {
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: 520px;
+  margin-bottom: 36px;
+}
+
+/* ── Demo block — redacted text preview ── */
+.demoBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px 28px;
+  margin-bottom: 40px;
+  font-size: 14px;
+  font-family: var(--font);
+  color: #1a1a2e;
+  text-align: left;
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.08),
+    0 8px 40px rgba(0,0,0,0.12);
+  max-width: 420px;
+  width: 100%;
+  position: relative;
+}
+
+.demoBlock::after {
+  content: 'PREVIEW';
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #b0b0c0;
+}
+
+.demoLine {
+  line-height: 1.8;
+}
+
+.demoLabel {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.redactedBar {
+  background: #1a1a1a;
+  color: transparent;
+  border-radius: 3px;
+  padding: 1px 6px;
+  user-select: none;
+  font-size: 14px;
+}
+
+.highlightYellow {
+  background: rgba(250, 204, 21, 0.35);
+  border: 1px solid rgba(234, 179, 8, 0.5);
+  border-radius: 3px;
+  padding: 0 4px;
+  color: #92600a;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.highlightPurple {
+  background: rgba(218, 119, 86, 0.2);
+  border: 1px solid rgba(218, 119, 86, 0.4);
+  border-radius: 3px;
+  padding: 0 4px;
+  color: #a14a2e;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+/* ── CTA button ── */
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.15s;
+  box-shadow: 0 4px 20px rgba(218, 119, 86, 0.3);
+}
+.ctaButton:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.ctaHint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 12px;
+}
+
+/* ── Bottom CTA ── */
+.bottomCta {
+  padding: 64px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  position: relative;
+  overflow: hidden;
+}
+
+.bottomCta::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 300px;
+  background: radial-gradient(ellipse, rgba(218, 119, 86, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bottomCtaTitle {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.bottomCtaSub {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+  max-width: 420px;
+  line-height: 1.6;
+}
+
+/* ── Steps section ── */
+.stepsSection {
+  padding: 56px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+  font-family: var(--font-mono);
+}
+
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  max-width: 800px;
+  width: 100%;
+  background: var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.stepCard {
+  background: var(--bg);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stepNum {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stepTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.stepDesc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ── Privacy architecture section ── */
+.privacySection {
+  padding: 64px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Green-tinted glow behind privacy section */
+.privacySection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(34, 197, 94, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.privacySub {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: 540px;
+  text-align: center;
+  margin-bottom: 44px;
+}
+
+.privacySub strong {
+  color: var(--success);
+  font-weight: 600;
+}
+
+/* ── Architecture diagram ── */
+.archDiagram {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.archNode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  min-width: 140px;
+  transition: border-color 0.2s;
+}
+
+.archNode:hover {
+  border-color: rgba(122, 132, 153, 0.4);
+}
+
+.archNodeAccent {
+  border-color: var(--accent);
+  background: rgba(218, 119, 86, 0.06);
+  box-shadow: 0 0 24px rgba(218, 119, 86, 0.08);
+}
+
+.archNodeAccent:hover {
+  border-color: var(--accent);
+}
+
+.archIcon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface2);
+  border-radius: 12px;
+  color: var(--text);
+}
+
+.archNodeAccent .archIcon {
+  background: rgba(218, 119, 86, 0.15);
+  color: var(--accent);
+}
+
+.archLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+.archSublabel {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  margin-top: -4px;
+}
+
+.archArrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+}
+
+.archArrowLine {
+  width: 48px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--border), var(--success), var(--border));
+  border-radius: 1px;
+  position: relative;
+}
+
+.archArrowLine::after {
+  content: '';
+  position: absolute;
+  right: -3px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--success);
+  border-top: 2px solid var(--success);
+  transform: rotate(45deg);
+}
+
+.archArrowText {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--success);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* ── Privacy detail cards ── */
+.privacyCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 800px;
+  width: 100%;
+}
+
+.privacyCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: border-color 0.2s;
+}
+
+.privacyCard:hover {
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.privacyCardIcon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(34, 197, 94, 0.1);
+  border-radius: 10px;
+  color: var(--success);
+  flex-shrink: 0;
+}
+
+.privacyCardTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.privacyCardDesc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* ── Features section ── */
+.featuresSection {
+  padding: 56px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px solid var(--border);
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  max-width: 700px;
+  width: 100%;
+}
+
+.featureCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.featureCard:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.featureTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.featureIcon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface2);
+  border-radius: 10px;
+  color: var(--accent);
+}
+
+.featureTag {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #fff;
+}
+
+.featureTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.featureDesc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ── Footer ── */
+.footer {
+  padding: 32px 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.footerMono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(122, 132, 153, 0.6);
+  margin-top: 4px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .stepsGrid {
+    grid-template-columns: 1fr;
+  }
+  .featuresGrid {
+    grid-template-columns: 1fr;
+  }
+  .heroSection {
+    padding: 40px 16px 32px;
+  }
+  .demoBlock {
+    padding: 16px 20px;
+  }
+  .privacyCards {
+    grid-template-columns: 1fr;
+  }
+  .archDiagram {
+    flex-direction: column;
+  }
+  .archArrowLine {
+    width: 2px;
+    height: 32px;
+  }
+  .archArrowLine::after {
+    right: -3px;
+    top: auto;
+    bottom: -3px;
+    transform: rotate(135deg);
+  }
+}

@@ -1,0 +1,44 @@
+.zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+  padding: 60px 40px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: var(--surface);
+  color: var(--text-muted);
+  text-align: center;
+  user-select: none;
+}
+
+.zone:hover {
+  border-color: var(--accent);
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.dragging {
+  border-color: var(--accent) !important;
+  background: var(--surface2) !important;
+  color: var(--text) !important;
+}
+
+.icon {
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+.primary {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.secondary {
+  font-size: 13px;
+  color: var(--text-muted);
+}
