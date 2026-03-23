@@ -234,6 +234,26 @@
   line-height: 1.6;
 }
 
+.deviceNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 520px;
+  width: 100%;
+}
+.deviceNote svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--warning);
+}
+
 /* ── Model picker on upload page ── */
 .modelPicker {
   width: 100%;
