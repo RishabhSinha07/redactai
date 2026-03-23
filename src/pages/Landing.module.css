@@ -213,6 +213,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  margin-top: 40px;
   padding: 14px 32px;
   background: var(--accent);
   color: #fff;
