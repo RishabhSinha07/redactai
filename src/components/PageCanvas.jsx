@@ -80,10 +80,11 @@ export default function PageCanvas({ page, pageIndex, spans, items, styles: font
     }
   }, [command]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 4. Notify parent
+  // 4. Notify parent with count and rects
   useEffect(() => {
-    onRedactionChange?.(pageIndex, redactions.length);
-  }, [redactions.length, pageIndex, onRedactionChange]);
+    const allRects = redactions.flatMap(r => r.rects);
+    onRedactionChange?.(pageIndex, redactions.length, allRects);
+  }, [redactions, pageIndex, onRedactionChange]);
 
   // 5. Draw overlay — key fix: set canvas size from state, not ref
   useEffect(() => {

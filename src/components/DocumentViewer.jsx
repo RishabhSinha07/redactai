@@ -6,7 +6,10 @@ import FindingsPanel from './FindingsPanel';
 import { extractText } from '../lib/pdfUtils';
 import { runRegex } from '../lib/regex';
 import { mergeSpans } from '../lib/spanMerger';
+import { exportRedactedPdf, downloadBlob } from '../lib/exportPdf';
 import styles from './DocumentViewer.module.css';
+
+const SCALE = 1.5;
 
 GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -22,6 +25,7 @@ export default function DocumentViewer({
   const [command, setCommand] = useState(null);
   const [findings, setFindings] = useState([]);
   const [showFindings, setShowFindings] = useState(false);
+  const pdfBytesRef = useRef(null); // preserved copy of PDF bytes for export
 
   // One worker per model
   const workersRef = useRef({}); // { modelId: worker }
@@ -101,6 +105,8 @@ export default function DocumentViewer({
   }, [fileBuffer]);
 
   async function loadPDF(buffer) {
+    // Copy buffer before PDF.js detaches it
+    pdfBytesRef.current = buffer.slice(0);
     onStatusChange('running');
     pageDataRef.current = [];
     setPages([]);
@@ -214,7 +220,10 @@ export default function DocumentViewer({
     setFindings(prev => prev.filter(f => f.source !== modelId));
   }
 
-  const handleRedactionChange = useCallback((pageIndex, count) => {
+  const redactionRectsRef = useRef({}); // { pageIndex: rects[] }
+
+  const handleRedactionChange = useCallback((pageIndex, count, rects) => {
+    redactionRectsRef.current[pageIndex] = rects || [];
     setRedactionCounts(prev => {
       const next = { ...prev, [pageIndex]: count };
       setPages(ps => {
@@ -226,6 +235,22 @@ export default function DocumentViewer({
       return next;
     });
   }, [onSpanCounts]);
+
+  async function handleDownload() {
+    if (!pdfBytesRef.current) return;
+    const redactedSpans = Object.entries(redactionRectsRef.current)
+      .filter(([, rects]) => rects.length > 0)
+      .map(([pageIndex, rects]) => ({ pageIndex: Number(pageIndex), rects }));
+
+    if (redactedSpans.length === 0) {
+      alert('No redactions applied yet. Click highlights to redact them first.');
+      return;
+    }
+
+    const bytes = await exportRedactedPdf(pdfBytesRef.current, redactedSpans, SCALE);
+    const redactedName = fileName.replace(/\.pdf$/i, '') + '_redacted.pdf';
+    downloadBlob(bytes, redactedName);
+  }
 
   function issueCommand(cmd) {
     setCommand(cmd);
@@ -257,6 +282,14 @@ export default function DocumentViewer({
               <line x1="16" y1="17" x2="8" y2="17"/>
             </svg>
             View Findings ({findings.length})
+          </button>
+          <button className={styles.btnDownload} onClick={handleDownload}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download Redacted PDF
           </button>
         </div>
         {/* Models */}
