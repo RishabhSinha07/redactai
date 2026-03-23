@@ -12,7 +12,7 @@ import styles from './DocumentViewer.module.css';
 const SCALE = 1.5;
 
 GlobalWorkerOptions.workerSrc = new URL(
-  '../pdf.worker.js',
+  'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url
 ).toString();
 

@@ -4,3 +4,4 @@ test-results
 tests/screenshot-*.png
 .vite
 *.local
+.vercel
