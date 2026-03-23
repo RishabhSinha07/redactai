@@ -25,6 +25,8 @@ export default function DocumentViewer({
   const [command, setCommand] = useState(null);
   const [findings, setFindings] = useState([]);
   const [showFindings, setShowFindings] = useState(false);
+  const [loadError, setLoadError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const pdfBytesRef = useRef(null); // preserved copy of PDF bytes for export
 
   // One worker per model
@@ -108,6 +110,8 @@ export default function DocumentViewer({
     // Copy buffer before PDF.js detaches it
     pdfBytesRef.current = buffer.slice(0);
     onStatusChange('running');
+    setLoadError(null);
+    setLoading(true);
     pageDataRef.current = [];
     setPages([]);
     setRedactionCounts({});
@@ -144,6 +148,7 @@ export default function DocumentViewer({
 
       const total = loadedPages.reduce((acc, p) => acc + p.spans.length, 0);
       onSpanCounts?.(total, 0);
+      setLoading(false);
       onStatusChange('ready');
 
       // Run NER for all ready models
@@ -152,6 +157,8 @@ export default function DocumentViewer({
       }
     } catch (err) {
       console.error('PDF load error:', err);
+      setLoading(false);
+      setLoadError(err.message || 'Failed to load PDF');
       onStatusChange('idle');
     }
   }
@@ -257,10 +264,27 @@ export default function DocumentViewer({
     setTimeout(() => setCommand(null), 0);
   }
 
-  if (!pages.length) return null;
+  // Loading state
+  if (loading && !pages.length) {
+    return hidden ? null : (
+      <div className={styles.loadingWrap}>
+        <div className={styles.loadingSpinner} />
+        <p className={styles.loadingText}>Loading PDF...</p>
+      </div>
+    );
+  }
 
-  // Build legend from enabled models
-  const enabledModelSet = new Set(enabledModels);
+  // Error state
+  if (loadError) {
+    return hidden ? null : (
+      <div className={styles.loadingWrap}>
+        <p className={styles.errorText}>Failed to load PDF</p>
+        <p className={styles.errorDetail}>{loadError}</p>
+      </div>
+    );
+  }
+
+  if (!pages.length) return null;
 
   return (
     <div className={styles.layout} style={hidden ? { display: 'none' } : {}}>
