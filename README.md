@@ -20,10 +20,8 @@
 Most redaction tools upload your sensitive documents to a server. **RedactAI is different** — the AI model runs entirely in your browser using WebAssembly. Not a single byte of your document is ever transmitted.
 
 ```
-┌──────────────┐      stays local      ┌──────────────────┐      all in-browser      ┌──────────────────┐
-│   Your PDF   │ ───────────────────▶  │  BERT NER Model  │ ──────────────────────▶  │  Redacted Output │
-│              │                        │  (WebAssembly)   │                          │                  │
-└──────────────┘                        └──────────────────┘                          └──────────────────┘
+  Your PDF ──── stays local ────> BERT NER Model ──── all in-browser ────> Redacted Output
+                                   (WebAssembly)
 ```
 
 - **No server uploads** — your PDF is read into browser memory and never touches a network request
