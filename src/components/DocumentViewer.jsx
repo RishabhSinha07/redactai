@@ -27,6 +27,7 @@ export default function DocumentViewer({
   const [showFindings, setShowFindings] = useState(false);
   const [loadError, setLoadError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [drawMode, setDrawMode] = useState(false);
   const pdfBytesRef = useRef(null); // preserved copy of PDF bytes for export
 
   // One worker per model
@@ -298,6 +299,16 @@ export default function DocumentViewer({
           <button className={styles.btnSecondary} onClick={() => issueCommand('clear-all')}>
             Clear All
           </button>
+          <button
+            className={`${styles.btnDraw} ${drawMode ? styles.btnDrawActive : ''}`}
+            onClick={() => setDrawMode(d => !d)}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M8 12h8"/>
+            </svg>
+            {drawMode ? 'Drawing Mode ON' : 'Manual Redact'}
+          </button>
           <button className={styles.btnFindings} onClick={() => setShowFindings(true)}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -371,6 +382,7 @@ export default function DocumentViewer({
               items={pageData.items}
               styles={pageData.styles}
               modelColorMap={modelColorMap}
+              drawMode={drawMode}
               command={command}
               onRedactionChange={handleRedactionChange}
             />

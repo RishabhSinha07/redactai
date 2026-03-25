@@ -23,18 +23,20 @@ function drawRoundRect(ctx, x, y, w, h, r) {
   }
 }
 
-export default function PageCanvas({ page, pageIndex, spans, items, styles: fontStyles, modelColorMap, command, onRedactionChange }) {
+export default function PageCanvas({ page, pageIndex, spans, items, styles: fontStyles, modelColorMap, drawMode, command, onRedactionChange }) {
   const pdfCanvasRef = useRef(null);
   const overlayRef = useRef(null);
   const renderTaskRef = useRef(null);
 
-  // Use STATE for dimensions so re-render happens when they're known
   const [canvasDims, setCanvasDims] = useState({ w: 612 * SCALE, h: 792 * SCALE });
   const [viewport, setViewport] = useState(null);
   const [highlights, setHighlights] = useState([]);
   const [redactions, setRedactions] = useState([]);
 
-  // 1. Render PDF page + set dimensions
+  // Drawing state for manual redaction
+  const [drawing, setDrawing] = useState(null); // { startX, startY, curX, curY }
+
+  // 1. Render PDF page
   useEffect(() => {
     if (!page) return;
     const vp = page.getViewport({ scale: SCALE });
@@ -80,13 +82,13 @@ export default function PageCanvas({ page, pageIndex, spans, items, styles: font
     }
   }, [command]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 4. Notify parent with count and rects
+  // 4. Notify parent
   useEffect(() => {
     const allRects = redactions.flatMap(r => r.rects);
     onRedactionChange?.(pageIndex, redactions.length, allRects);
   }, [redactions, pageIndex, onRedactionChange]);
 
-  // 5. Draw overlay — key fix: set canvas size from state, not ref
+  // 5. Draw overlay
   useEffect(() => {
     const canvas = overlayRef.current;
     if (!canvas) return;
@@ -98,7 +100,7 @@ export default function PageCanvas({ page, pageIndex, spans, items, styles: font
 
     const r = 3;
 
-    // Highlights — color by source: yellow for regex, model color for NER
+    // Highlights
     for (const { span, rects } of highlights) {
       const mc = span.modelId && modelColorMap?.[span.modelId];
       if (mc) {
@@ -129,17 +131,49 @@ export default function PageCanvas({ page, pageIndex, spans, items, styles: font
         ctx.restore();
       }
     }
-  }, [highlights, redactions, canvasDims]);
 
-  // Click handler
-  const handleClick = useCallback((e) => {
+    // Active drawing rectangle
+    if (drawing) {
+      const dx = Math.min(drawing.startX, drawing.curX);
+      const dy = Math.min(drawing.startY, drawing.curY);
+      const dw = Math.abs(drawing.curX - drawing.startX);
+      const dh = Math.abs(drawing.curY - drawing.startY);
+      if (dw > 2 && dh > 2) {
+        ctx.strokeStyle = 'var(--accent, #da7756)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        drawRoundRect(ctx, dx, dy, dw, dh, r);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(218, 119, 86, 0.1)';
+        drawRoundRect(ctx, dx, dy, dw, dh, r);
+        ctx.fill();
+      }
+    }
+  }, [highlights, redactions, canvasDims, drawing, modelColorMap]);
+
+  // Convert mouse/touch event to canvas coordinates
+  function toCanvasCoords(e) {
     const canvas = overlayRef.current;
-    if (!canvas) return;
+    if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    const cx = (e.clientX - rect.left) * scaleX;
-    const cy = (e.clientY - rect.top) * scaleY;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
+    };
+  }
+
+  // Click handler (normal mode)
+  const handleClick = useCallback((e) => {
+    if (drawMode) return; // handled by mouse events in draw mode
+
+    const canvas = overlayRef.current;
+    if (!canvas) return;
+    const { x: cx, y: cy } = toCanvasCoords(e);
 
     function hitTest(list) {
       for (let i = list.length - 1; i >= 0; i--) {
@@ -154,7 +188,10 @@ export default function PageCanvas({ page, pageIndex, spans, items, styles: font
     if (ri !== -1) {
       const restored = redactions[ri];
       setRedactions(prev => prev.filter((_, i) => i !== ri));
-      setHighlights(prev => [...prev, restored]);
+      // Only restore to highlights if it came from a detected span (not manual)
+      if (restored.span) {
+        setHighlights(prev => [...prev, restored]);
+      }
       return;
     }
 
@@ -164,7 +201,38 @@ export default function PageCanvas({ page, pageIndex, spans, items, styles: font
       setHighlights(prev => prev.filter((_, i) => i !== hi));
       setRedactions(prev => [...prev, applied]);
     }
-  }, [highlights, redactions]);
+  }, [highlights, redactions, drawMode]);
+
+  // Draw mode handlers
+  function handleMouseDown(e) {
+    if (!drawMode) return;
+    e.preventDefault();
+    const { x, y } = toCanvasCoords(e);
+    setDrawing({ startX: x, startY: y, curX: x, curY: y });
+  }
+
+  function handleMouseMove(e) {
+    if (!drawing) return;
+    const { x, y } = toCanvasCoords(e);
+    setDrawing(prev => prev ? { ...prev, curX: x, curY: y } : null);
+  }
+
+  function handleMouseUp() {
+    if (!drawing) return;
+    const dx = Math.min(drawing.startX, drawing.curX);
+    const dy = Math.min(drawing.startY, drawing.curY);
+    const dw = Math.abs(drawing.curX - drawing.startX);
+    const dh = Math.abs(drawing.curY - drawing.startY);
+    setDrawing(null);
+
+    // Only create redaction if rectangle is big enough
+    if (dw > 5 && dh > 5) {
+      setRedactions(prev => [
+        ...prev,
+        { span: null, rects: [{ x: dx, y: dy, w: dw, h: dh }] },
+      ]);
+    }
+  }
 
   return (
     <div
@@ -174,9 +242,16 @@ export default function PageCanvas({ page, pageIndex, spans, items, styles: font
       <canvas ref={pdfCanvasRef} className={styles.pdf} />
       <canvas
         ref={overlayRef}
-        className={styles.overlay}
+        className={`${styles.overlay} ${drawMode ? styles.overlayDraw : ''}`}
         onClick={handleClick}
-        title="Click highlight → redact · Click black bar → undo"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onTouchStart={handleMouseDown}
+        onTouchMove={handleMouseMove}
+        onTouchEnd={handleMouseUp}
+        title={drawMode ? 'Click and drag to draw a redaction box' : 'Click highlight → redact · Click black bar → undo'}
       />
     </div>
   );
